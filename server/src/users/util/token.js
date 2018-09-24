@@ -18,14 +18,16 @@ const create_token = async (user) => {
   }
 
   // Options for signing a token.
-  return jwt.sign(
-    { id: user._id,
-      username: user.username,
-      scope: scope },
-    process.env.JWT_SECRET,
-    { algorithm: "HS256",
-      expiresIn: "1h" }
-  );
+  return jwt.sign({ 
+    id: user._id,
+    username: user.username,
+    scope: scope 
+  },
+  process.env.JWT_SECRET,
+  { 
+    algorithm: "HS256",
+    expiresIn: "1h" 
+  });
 
 }
 

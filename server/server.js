@@ -58,10 +58,10 @@ const init = async() => {
   await server.register(hapi_auth_jwt);
 
   // Define the authentication strategy.
-  server.auth.strategy("jwt", "jwt",
-  { key: process.env.JWT_SECRET,
-    verifyOptions: 
-    { algorithms: [ 'HS256' ],
+  server.auth.strategy("jwt", "jwt", { 
+    key: process.env.JWT_SECRET,
+    verifyOptions: { 
+      algorithms: [ 'HS256' ],
       ignoreExpiration: true
     },
     validate: validate_user

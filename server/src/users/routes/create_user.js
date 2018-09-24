@@ -7,8 +7,11 @@ Route for creating a user.
 */
 module.exports = { method: "POST",
 	path: "/users/register",
-	config: 
-    { auth: false,
-      pre: [{ method: verify_unique_user}],
-      handler: create_user.create }
+	config: { 
+    auth: false,
+    pre: [{ 
+      method: verify_unique_user
+    }],
+    handler: create_user.create 
+  }
 }
