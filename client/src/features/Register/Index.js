@@ -20,7 +20,7 @@ class Register extends Component {
       pass_retype_verify: false
     }
     
-
+    // Form validator to be called when a form is submitted.
     this.validator = new FormValidator([
       {
         field: "email",
