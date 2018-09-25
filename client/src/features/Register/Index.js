@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import FormValidator from "./FormValidator";
+import * as DefaultValidations from "./DefaultValidations";
+
 
 class Register extends Component {
 
@@ -17,61 +19,60 @@ class Register extends Component {
       pass_verify: false,
       pass_retype_verify: false
     }
-
-    this.regex_email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    this.regex_password = /^(?=.*?[0-9])(?=.*?[A-Z])(?=.*?[#?!@$%^&*\-_]).{6,}$/;
+    
 
     this.validator = new FormValidator([
       {
         field: "email",
-        method: this.is_empty,
+        method: "is_empty",
         valid_when: false,
         message: "Email cannot be empty."
       },
       { 
         field: "email", 
-        method: this.regex_validation,
-        args: 
-        { regex: this.regex_email, 
-          cs: false },
+        method: "regex_validation",
+        args: { 
+          regex: "email", 
+          cs: false 
+        },
         valid_when: true, 
         message: "Invalid Email." 
       },
       { 
         field: "username", 
-        method: this.is_empty, 
+        method: "is_empty", 
         valid_when: false, 
         message: "Username cannot be empty."
       },
       { 
         field: "username", 
-        method: this.size_check,
+        method: "size_check",
         args: { size:2 }, 
         valid_when: false, 
         message: "Username must be at least 2 characters long."
       },
       { 
         field: "password", 
-        method: this.is_empty, 
+        method: "is_empty", 
         valid_when: false, 
         message: "Password cannot be empty."
       },
       { 
         field: "password", 
-        method: this.regex_validation,
-        args: { regex: this.regex_password }, 
+        method: "regex_validation",
+        args: { regex: "password" }, 
         valid_when: true, 
         message: "Invalid Password."
       },
       { 
         field: "password_retype", 
-        method: this.is_empty, 
-        valid_when: true, 
+        method: "is_empty", 
+        valid_when: false, 
         message: "Password does not match."
       },
       { 
         field: "password_retype", 
-        method: this.password_match, 
+        method: "password_match", 
         valid_when: true, 
         message: "Password does not match."
       }
@@ -79,80 +80,92 @@ class Register extends Component {
     ]);
   }
 
-  is_empty = (confirmation) => (confirmation.length == 0);
-  password_match = (confirmation, state) => (confirmation === state.password);
-  size_check = (confirmation, context) => (confirmation.length < context.size);
-  regex_validation = (confirmation, context) => {
-    if (context.cs == false) return context.regex.test(String(confirmation).toLowerCase());
-    else return context.regex.test(String(confirmation));
-  }
 
-  componentDidMount() {
-    //let valid = this.validator.validate(this.state.form_inputs);
-    //console.log(valid);
-  }
-
-
+  /*
+  Verify field whenever the input changes.
+  */
   verifiy = (field, value) => {
-    if (field == "email") {
-      if (this.regex_validation(value, { regex: this.regex_email, cs: false })) {
-        this.setState({ em_verify: true });
-      }
-      else {
-        this.setState({ em_verify: false });
-      }
-    }
-    else if (field == "username") {
-      if (!this.size_check(value, { size: 2 })) {
-        this.setState({ username_verify: true });
-      }
-      else {
-        this.setState({ username_verify: false });
-      }
-    }
-    else if (field == "password") {
-      if (this.regex_validation(value, { regex: this.regex_password })) {
+    
+    // All states hold the input validation status.
+    let em_verify = this.state.em_verify;
+    let username_verify = this.state.username_verify;
+    let pass_verify = this.state.pass_verify;
+    let pass_retype_verify = this.state.pass_retype_verify;
+    
+    // Validate the currently active input.
+    switch(field) {
+      
+      case "email":
         
-        this.setState({ pass_verify: true});
+        // Validate the email against a regex.
+        em_verify = DefaultValidations.regex_validation(value, { regex: "email", cs: false });
+        em_verify ? this.setState({ em_verify: true }) : this.setState({ em_verify: false });
         
-        if (value === this.state.password_retype && !this.is_empty(this.state.password_retype)) {
-          this.setState({ pass_retype_verify: true});
-        }
-        else {
-          this.setState({ pass_retype_verify: false });
-        }
-      }
-      else {
-        this.setState(
-          { pass_verify: false, 
-            pass_retype_verify: false }
-        );
-      }
-    }
+        break;
+    
+      case "username":
 
-    else if (field == "password_retype") {
-      //console.log(value, this.state.form_inputs);
-      if (this.password_match(value, this.state.form_inputs)) {
-        this.setState({ pass_retype_verify: true });
-      }
-      else {
-        this.setState({ pass_retype_verify: false });
-      }
+        // Ensure the username length is at least 2 characters.
+        username_verify = !DefaultValidations.size_check(value, { size: 2 });
+        username_verify ? this.setState({ username_verify: true }) : this.setState({ username_verify: false });
+        
+        break;
+
+      case "password":
+        
+        // Validate the password against a regex.
+        pass_verify = DefaultValidations.regex_validation(value, { regex: "password" });
+        
+        // Check if the re-typed password exists and whether it equals the current password.
+        pass_retype_verify = !DefaultValidations.is_empty(this.state.form_inputs.password_retype) && value === this.state.form_inputs.password_retype;
+
+        // Password is valid and the re-typed password is equal to the password.
+        pass_verify && pass_retype_verify ? this.setState({ pass_retype_verify: true}) : this.setState({ pass_retype_verify: false });
+        
+        // Password is not valid then neither is the re-typed password.
+        pass_verify ? this.setState({ pass_verify: true}) : this.setState({ pass_verify: false, pass_retype_verify: false });
+        
+        break;
+
+      case "password_retype":
+
+        // Check if re-typed password equals the current password and that the field is not empty.
+        pass_retype_verify = DefaultValidations.password_match(value, this.state.form_inputs) && value.length > 0 && this.state.pass_verify;
+        pass_retype_verify ? this.setState({ pass_retype_verify: true }) : this.setState({ pass_retype_verify: false });
+        
+        break;
+
     }
 
   }
 
 
+  /*
+  Update the state for form inputs as a user types in an input.
+  */
   handle_change = (e) => {
+
+    // Make a copy of the state object and update it.
     let new_form = Object.assign({}, this.state.form_inputs);
     new_form[e.target.name] = e.target.value;
+
+    // Update the state itself with the new state.
     this.setState({ form_inputs: new_form });
+
+    // Verify that the input is in the correct format
+    // for every key event.
     this.verifiy(e.target.name, e.target.value);
+
   }
 
 
   submit_handler = (e) => {
+    
     e.preventDefault();
+
+    let form_validation = this.validator.validate(this.state.form_inputs);
+    console.log(form_validation);
+
   }
 
   

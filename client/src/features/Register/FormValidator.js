@@ -1,4 +1,8 @@
+import * as DefaultValidations from "./DefaultValidations";
+
+
 class FormValidator {
+
   constructor(validations) {
     this.validations = validations;
   }
@@ -17,9 +21,13 @@ class FormValidator {
     this.validations.forEach(rule => {
       if (!validation[rule.field].is_invalid) {
         const field_value = state[String(rule.field)].toString();
-        const validation_method = rule.method;
+        const validation_method = typeof rule.method === "string" ? DefaultValidations[rule.method] : rule.method;
         const args = rule.args || undefined;
-        if (validation_method(field_value, args, state) !== rule.valid_when) {
+
+        let params;
+        args != undefined ? params = [field_value, args, state] : params = [field_value, state];
+        
+        if (validation_method(...params) !== rule.valid_when) {
           validation[rule.field] = { is_invalid: true, message: rule.message }
           validation.is_valid = false;
         }
