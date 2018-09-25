@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import FormValidator from "./FormValidator";
-import * as DefaultValidations from "./DefaultValidations";
+import FormValidator from "../../utils/FormValidator";
+import * as DefaultValidations from "../../utils/DefaultValidations";
 
 
 class Register extends Component {
