@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import FormValidator from "../../utils/FormValidator";
 import * as DefaultValidations from "../../utils/DefaultValidations";
+import API from "../../utils/API";
 
 
 class Register extends Component {
@@ -17,7 +18,8 @@ class Register extends Component {
       em_verify: false,
       username_verify: false,
       pass_verify: false,
-      pass_retype_verify: false
+      pass_retype_verify: false,
+      server_err_msg: ""
     }
     
     // Form validator to be called when a form is submitted.
@@ -158,13 +160,35 @@ class Register extends Component {
 
   }
 
-
+  /*
+  Submit the form.
+  */
   submit_handler = (e) => {
     
     e.preventDefault();
 
     let form_validation = this.validator.validate(this.state.form_inputs);
-    console.log(form_validation);
+    let form_data = this.validator.get_values(["password_retype"]);
+    if (form_validation.is_valid) {
+      //console.log(form_data);
+      const api = new API({ url: "http://localhost:3000/users" });
+      api.create_entity({ name: "register" });
+      api.endpoints.register.create({ data: form_data })
+        .then(response => {
+          return response.json()
+        })
+        .then(json_response => {
+          console.log(json_response);
+          if ([4,5].includes(json_response.statusCode / 100)) {
+            this.setState({ server_err_msg: json_response.message });
+            let err = new Error("HTTP status code: " + json_response.statusCode);
+            err.response = json_response;
+            err.status = json_response.statusCode;
+            throw err;
+          }
+          this.props.history.push("/verify", { ok: true });
+        });
+    }
 
   }
 
@@ -205,6 +229,7 @@ class Register extends Component {
           {this.state.pass_retype_verify ? <p>YES</p> : <p>NO</p>}
         </label>
         <input type="submit" />
+        <label>{ this.state.server_err_msg }</label>
       </form>
     );
   }

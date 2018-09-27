@@ -7,14 +7,13 @@ const User = require("../models/User.js");
 Check if a user already exists within a database.
 */
 const verify_unique_user = async (req, h) => {
-  
-  
+
   // Check if email or username exists.
   const user = await User.findOne({
     $or: [{email: req.payload.email}, {username: req.payload.username}]
   });
 
-  
+  console.log(user);
   // If user is found.
   if (user) {
     
@@ -29,7 +28,6 @@ const verify_unique_user = async (req, h) => {
     }
   }
   
-
   // If everything checks out, we send the user
   // to the handler.
   return req.payload;

@@ -10,20 +10,37 @@ class FormValidator {
     
     // Validation rules and details.
     this.validations = validations;
+
+    // Results.
+    this.results = "";
+
+  }
+
+  get_values = (exclude) => {
+
+    let result = {};
+    
+    exclude = [...exclude, "is_valid"];
+
+    Object.entries(this.results)
+      .forEach((key, val) => 
+        (!exclude.includes(key[0]) ? result[key[0]] = key[1].field : undefined ));
+    
+    return result;
   }
 
 
   /*
   Assume form is valid.
   */
-  valid() {
+  valid = () => {
 
     // Holds the default details of the fields of the form.
     const validation = {};
 
     // Fields are valid by default.
     this.validations.map(rule => (
-      validation[rule.field] = { is_invalid: false, message: "" }
+      validation[rule.field] = { is_invalid: false, message: "", field: "" }
     ));
     
     // Assume it is valid.
@@ -34,7 +51,7 @@ class FormValidator {
   /*
   Validate the form and its fields.
   */
-  validate(state) {
+  validate = (state) => {
 
     // Assume the form is valid and all fields are valid.
     let validation = this.valid();
@@ -62,11 +79,17 @@ class FormValidator {
         // If the field is not valid,
         // change the status of the form and the field as well.
         if (validation_method(...params) !== rule.valid_when) {
-          validation[rule.field] = { is_invalid: true, message: rule.message }
+          validation[rule.field] = { is_invalid: true, message: rule.message, field: "" };
           validation.is_valid = false;
+        }
+        else {
+          validation[rule.field].field = field_value;
         }
       }
     });
+
+    // Save the results.
+    this.results = validation;
 
     return validation;
 

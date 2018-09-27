@@ -73,7 +73,7 @@ const init = async() => {
   // Register all the routes.
   register_routes();
 
-
+  
   await server.start();
 
   return server;

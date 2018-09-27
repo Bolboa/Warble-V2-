@@ -55,15 +55,15 @@ const email_verification = async (email, token) => {
 Create a new user.
 */
 exports.create = async (req, h) => {
-	
+
+  console.log("here1");
+  console.log(req.pre.user);
 	// Define new user.
 	const user = await new User();
-	user.first_name = req.payload.first_name;
-	user.last_name = req.payload.last_name;
 	user.username = req.payload.username;
 	user.email = req.payload.email;
 
-  
+
 	// Hash the password.
 	await hash_password(req.payload.password)
 	.then(hash => {

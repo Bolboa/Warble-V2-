@@ -4,7 +4,8 @@ const create_token = require("../util/token.js").create_token;
 /*
 Route for authenticating a user.
 */
-module.exports = { method: "POST",
+module.exports = { 
+  method: "POST",
 	path: "/users/authenticate",
 	config: { 
     auth: false,

@@ -1,3 +1,4 @@
+import axios from "axios";
 
 class API {
 
@@ -23,12 +24,12 @@ class API {
   Create the basic endpoint handlers for CRUD operations.
   */
   create_basic_CRUD_endpoints({ name }) {
-      
+
     var endpoints = {};
-    const resource_url = `${this.url}/${name}`;
+    const resource_url = `${ this.url }/${ name }`;
         
     // Fetch all objects.
-    endpoints.get_all = ({query}={}) => fetch(resource_url, {
+    endpoints.get_all = ({ query } = {}) => fetch(resource_url, {
       method: "GET",
       headers: {
         "Accept": "application/json",
@@ -37,12 +38,21 @@ class API {
     });
       
     // Fetch a specific object.
-    endpoints.get_one = ({ id }) =>  fetch(`${resource_url}/${id}`, {
+    endpoints.get_one = ({ id }) => fetch(`${resource_url}/${id}`, {
       method: "GET",
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json"
       }
+    });
+
+    endpoints.create = ({ data }) => fetch(resource_url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
     });
   
     return endpoints;

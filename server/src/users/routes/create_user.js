@@ -5,12 +5,14 @@ const verify_unique_user = require("../util/user_function.js").verify_unique_use
 /*
 Route for creating a user.
 */
-module.exports = { method: "POST",
+module.exports = { 
+  method: "POST",
 	path: "/users/register",
 	config: { 
     auth: false,
     pre: [{ 
-      method: verify_unique_user
+      method: verify_unique_user,
+      assign: "user"
     }],
     handler: create_user.create 
   }
