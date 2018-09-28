@@ -171,6 +171,8 @@ class Register extends Component {
   */
   submit_handler = (e) => {
 
+    console.log(process.env);
+
     this.state.cookies.set("name", "test", { path: "/" });
     
     // Prevent default form behaviour of refreshing the page.
