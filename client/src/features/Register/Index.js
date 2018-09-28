@@ -171,7 +171,7 @@ class Register extends Component {
   */
   submit_handler = (e) => {
 
-    this.state.cookies.set("name", "bitch", { path: "/" });
+    this.state.cookies.set("name", "test", { path: "/" });
     
     // Prevent default form behaviour of refreshing the page.
     e.preventDefault();
