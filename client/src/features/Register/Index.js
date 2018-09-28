@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import FormValidator from "../../utils/FormValidator";
 import * as DefaultValidations from "../../utils/DefaultValidations";
 import API from "../../utils/API";
+import Cookies from "universal-cookie";
 
 
 class Register extends Component {
@@ -82,6 +83,10 @@ class Register extends Component {
     ]);
   }
 
+  componentDidMount = () => {
+    console.log(this.state.cookies);
+  }
+
 
   /*
   Verify field whenever the input changes.
@@ -160,34 +165,57 @@ class Register extends Component {
 
   }
 
+
   /*
   Submit the form.
   */
   submit_handler = (e) => {
+
+    this.state.cookies.set("name", "bitch", { path: "/" });
     
+    // Prevent default form behaviour of refreshing the page.
     e.preventDefault();
 
+    // Validate the form.
     let form_validation = this.validator.validate(this.state.form_inputs);
+
+    // Get all the input values except from the fields defined in the parameter array.
     let form_data = this.validator.get_values(["password_retype"]);
+    
+    // Form is valid.
     if (form_validation.is_valid) {
-      //console.log(form_data);
+      
+      // Define the REST API.
       const api = new API({ url: "http://localhost:3000/users" });
+      
+      // Define the route.
       api.create_entity({ name: "register" });
+      
+      // Create user.
       api.endpoints.register.create({ data: form_data })
-        .then(response => {
-          return response.json()
-        })
+        .then(response => response.json())
         .then(json_response => {
-          console.log(json_response);
+
+          // Status is a 400 or 500 error.
           if ([4,5].includes(json_response.statusCode / 100)) {
+
+            // Save the custom error message.
             this.setState({ server_err_msg: json_response.message });
+
+            // Define and throw the error.
             let err = new Error("HTTP status code: " + json_response.statusCode);
             err.response = json_response;
             err.status = json_response.statusCode;
             throw err;
+
           }
+
+          console.log(json_response);
+          // Redirect the user to the email verification page if the user is
+          // created successfully.
           this.props.history.push("/verify", { ok: true });
-        });
+
+      });
     }
 
   }
