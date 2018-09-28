@@ -84,7 +84,6 @@ class Register extends Component {
   }
 
   componentDidMount = () => {
-    console.log(this.state.cookies);
   }
 
 
@@ -171,9 +170,7 @@ class Register extends Component {
   */
   submit_handler = (e) => {
 
-    console.log(process.env);
-
-    this.state.cookies.set("name", "test", { path: "/" });
+    //this.state.cookies.set("name", "test", { path: "/" });
     
     // Prevent default form behaviour of refreshing the page.
     e.preventDefault();
@@ -188,7 +185,7 @@ class Register extends Component {
     if (form_validation.is_valid) {
       
       // Define the REST API.
-      const api = new API({ url: "http://localhost:3000/users" });
+      const api = new API({ url: process.env.API_URL + "/users" });
       
       // Define the route.
       api.create_entity({ name: "register" });
