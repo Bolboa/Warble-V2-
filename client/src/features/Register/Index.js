@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import FormValidator from "../../utils/FormValidator";
 import * as DefaultValidations from "../../utils/DefaultValidations";
 import API from "../../utils/API";
+import JwtVerifier from "../../utils/JWT";
 import Cookies from 'js-cookie';
 
 
@@ -85,6 +86,7 @@ class Register extends Component {
 
   componentDidMount = () => {
     let jwt = Cookies.get("jwt");
+    let verified = JwtVerifier(jwt);
   }
 
 
@@ -174,6 +176,7 @@ class Register extends Component {
     // Prevent default form behaviour of refreshing the page.
     e.preventDefault();
 
+
     // Validate the form.
     let form_validation = this.validator.validate(this.state.form_inputs);
 
@@ -183,11 +186,16 @@ class Register extends Component {
     // Form is valid.
     if (form_validation.is_valid) {
       
+      // Define the headers.
+      let headers = new Headers();
+      headers.append("Content-Type", "application/json");
+      headers.append("Accept", "application/json");
+      
       // Define the REST API.
       const api = new API({ url: process.env.API_URL + "/users" });
       
       // Define the route.
-      api.create_entity({ name: "register" });
+      api.create_entity({ name: "register" }, headers);
       
       // Create user.
       api.endpoints.register.create({ data: form_data })
@@ -215,7 +223,10 @@ class Register extends Component {
           // created successfully.
           this.props.history.push("/verify", { ok: true });
 
-      });
+      })
+      .catch(err => {
+        throw err;
+      })
     }
 
   }
