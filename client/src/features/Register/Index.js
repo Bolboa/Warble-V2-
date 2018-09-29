@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import FormValidator from "../../utils/FormValidator";
 import * as DefaultValidations from "../../utils/DefaultValidations";
 import API from "../../utils/API";
-import Cookies from "universal-cookie";
+import Cookies from 'js-cookie';
 
 
 class Register extends Component {
@@ -84,6 +84,7 @@ class Register extends Component {
   }
 
   componentDidMount = () => {
+    let jwt = Cookies.get("jwt");
   }
 
 
@@ -169,9 +170,7 @@ class Register extends Component {
   Submit the form.
   */
   submit_handler = (e) => {
-
-    //this.state.cookies.set("name", "test", { path: "/" });
-    
+        
     // Prevent default form behaviour of refreshing the page.
     e.preventDefault();
 
@@ -209,7 +208,9 @@ class Register extends Component {
 
           }
 
-          console.log(json_response);
+          // Save JWT in cookie.
+          Cookies.set("jwt", json_response.id_token);
+
           // Redirect the user to the email verification page if the user is
           // created successfully.
           this.props.history.push("/verify", { ok: true });

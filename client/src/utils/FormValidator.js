@@ -16,17 +16,24 @@ class FormValidator {
 
   }
 
+
+  /*
+  Get all form input values save the ones that the user opts out of.
+  */
   get_values = (exclude) => {
 
     let result = {};
     
+    // Values that will not be included.
     exclude = [...exclude, "is_valid"];
 
+    // Extract all of the input values.
     Object.entries(this.results)
       .forEach((key, val) => 
         (!exclude.includes(key[0]) ? result[key[0]] = key[1].field : undefined ));
     
     return result;
+    
   }
 
 
